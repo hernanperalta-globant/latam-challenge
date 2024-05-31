@@ -1,39 +1,28 @@
-# from typing import List, Tuple
-# from datetime import datetime
-
-# def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
-#     pass
-
-
 from typing import List, Tuple
 from datetime import datetime
 from collections import defaultdict, Counter
 import json
 from multiprocessing import Pool, cpu_count
 
-from q1.utils import TweetDateCount, count_tweet, find_top_user_by_date, sort_dates_by_count
+from src.q1.utils import TweetDateCounter, count_tweet_user_by_date, find_top_user_by_date, sort_dates_by_count
+from src.utils import load_all_tweets
 
-
-def read_lines(file_path: str) -> List[str]:
-    with open(file_path, 'r') as file:
-        return [line for line in file]
 
 
 def process_tweets_batch(tweets_batch: List[str]) -> dict:
-    date_count = defaultdict(Counter)
+    date_counter = defaultdict(Counter)
 
-    for line in tweets_batch:
-        tweet = json.loads(line)
-
-        count_tweet(date_count, tweet)
+    for raw_tweet in tweets_batch:
+        tweet = json.loads(raw_tweet)
+        count_tweet_user_by_date(date_counter, tweet)
     
-    return date_count
+    return date_counter
 
 
-def merge_counts(date_counts: List[TweetDateCount]) -> TweetDateCount:
+def merge_counters(date_counters: List[TweetDateCounter]) -> TweetDateCounter:
     merged = defaultdict(Counter)
 
-    for counter in date_counts:
+    for counter in date_counters:
         for date, user_counter in counter.items():
             merged[date] += user_counter
 
@@ -41,17 +30,17 @@ def merge_counts(date_counts: List[TweetDateCount]) -> TweetDateCount:
 
 
 def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
-    lines = read_lines(file_path)
+    tweets = load_all_tweets(file_path)
     num_workers = cpu_count()
-    batch_size = len(lines) // num_workers
+    batch_size = len(tweets) // num_workers
 
     with Pool(num_workers) as pool:
-        batch = [lines[i:i + batch_size] for i in range(0, len(lines), batch_size)]
+        batch = [tweets[i:i + batch_size] for i in range(0, len(tweets), batch_size)]
         results = pool.map(process_tweets_batch, batch)
     
-    merged_counts = merge_counts(results)
+    merged_counters = merge_counters(results)
 
-    top_dates = sort_dates_by_count(merged_counts)
+    top_dates = sort_dates_by_count(merged_counters)
     result = find_top_user_by_date(top_dates)
 
     return result
