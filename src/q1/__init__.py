@@ -10,7 +10,7 @@ def get_tweet_count(date_counter: Tuple[datetime.date, Counter]) -> int:
     return sum(date_counter[1].values())
 
 
-def count_tweet_user_by_date(date_counter: TweetDateCounter, tweet: Dict) -> None:
+def count_user_by_date(date_counter: TweetDateCounter, tweet: Dict) -> None:
     date = datetime.strptime(tweet['date'], '%Y-%m-%dT%H:%M:%S%z').date()
     user = tweet['user']['username']
 
@@ -32,7 +32,7 @@ def sort_dates_by_count(date_counter: TweetDateCounter) -> TweetDateCounter:
 __all__ = [
     "TweetDateCounter",
     "get_tweet_count",
-    "count_tweet_user_by_date",
+    "count_user_by_date",
     "top_user",
     "find_top_user_by_date",
     "sort_dates_by_count"
