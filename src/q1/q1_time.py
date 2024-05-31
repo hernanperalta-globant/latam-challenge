@@ -4,12 +4,12 @@ from collections import defaultdict, Counter
 import json
 from multiprocessing import Pool, cpu_count
 
-from src.q1.utils import TweetDateCounter, count_tweet_user_by_date, find_top_user_by_date, sort_dates_by_count
-from src.utils import load_all_tweets
+from src.q1 import count_tweet_user_by_date, find_top_user_by_date, sort_dates_by_count, TweetDateCounter
+from src import load_all_tweets
 
 
-def process_tweets_batch(tweets_batch: List[str]) -> dict:
-    date_counter = defaultdict(Counter)
+def process_tweets_batch(tweets_batch: List[str]) -> TweetDateCounter:
+    date_counter: TweetDateCounter = defaultdict(Counter)
 
     for raw_tweet in tweets_batch:
         tweet = json.loads(raw_tweet)
@@ -19,7 +19,7 @@ def process_tweets_batch(tweets_batch: List[str]) -> dict:
 
 
 def merge_counters(date_counters: List[TweetDateCounter]) -> TweetDateCounter:
-    merged = defaultdict(Counter)
+    merged: TweetDateCounter = defaultdict(Counter)
 
     for counter in date_counters:
         for date, user_counter in counter.items():
@@ -38,7 +38,6 @@ def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
         results = pool.map(process_tweets_batch, batch)
     
     merged_counters = merge_counters(results)
-
     top_dates = sort_dates_by_count(merged_counters)
     result = find_top_user_by_date(top_dates)
 
