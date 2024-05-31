@@ -4,6 +4,11 @@ from typing import Dict, List
 
 
 def extract_emojis(text: str) -> List[str]:
+    """Extracts all emojis found on a given text.
+
+    :param text: Text with emojis.
+    :return: List of emojis found in text.
+    """    
     emoji_pattern = re.compile(
         r'['
         r'\U0001F600-\U0001F64F'  # emoticons

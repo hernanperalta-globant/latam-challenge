@@ -2,10 +2,19 @@ from typing import List, Tuple
 from datetime import datetime
 from collections import defaultdict, Counter
 import json
-from multiprocessing import Pool, cpu_count
 
-from src.q1 import count_user_by_date, find_top_user_by_date, sort_dates_by_count, TweetDateCounter
-from src import load_all_tweets, multiprocess_tweets
+from src.q1 import count_user_by_date, top_users_per_date, top_most_tweeted_dates, TweetDateCounter
+from src import multiprocess_tweets
+
+
+def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
+    results = multiprocess_tweets(file_path, count_users_by_date)
+    merged_counters = merge_counters(results)
+
+    top_dates = top_most_tweeted_dates(merged_counters)
+    result = top_users_per_date(top_dates)
+
+    return result
 
 
 def count_users_by_date(tweets_batch: List[str]) -> TweetDateCounter:
@@ -26,12 +35,3 @@ def merge_counters(date_counters: List[TweetDateCounter]) -> TweetDateCounter:
             merged[date] += user_counter
 
     return merged
-
-
-def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
-    results = multiprocess_tweets(file_path, count_users_by_date)    
-    merged_counters = merge_counters(results)
-    top_dates = sort_dates_by_count(merged_counters)
-    result = find_top_user_by_date(top_dates)
-
-    return result
