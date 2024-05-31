@@ -8,7 +8,6 @@ from src.q1.utils import TweetDateCounter, count_tweet_user_by_date, find_top_us
 from src.utils import load_all_tweets
 
 
-
 def process_tweets_batch(tweets_batch: List[str]) -> dict:
     date_counter = defaultdict(Counter)
 
